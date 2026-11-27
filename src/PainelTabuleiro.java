@@ -14,6 +14,11 @@ public class PainelTabuleiro extends javax.swing.JPanel {
     
     private javax.swing.Timer cronometro;
     private int segundosDecorridos = 0;
+    
+    private javax.swing.JLabel[] slotsBrancas = new javax.swing.JLabel[16];
+    private javax.swing.JLabel[] slotsPretas = new javax.swing.JLabel[16];
+    private int qtdCapturadasBrancas = 0;
+    private int qtdCapturadasPretas = 0;
 
     /**
      * Creates new form PainelTabuleiro
@@ -26,6 +31,7 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         painelCentral.add(tabuleiro);
         
         configurarCronometro();
+        criarSlotsCapturadas();
     }
     
     private void configurarCronometro() {
@@ -47,10 +53,12 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         
         // Se capturou alguma peça, adiciona no painel lateral correspondente
         if(!pecaCapturada.isEmpty()) {
-            if(!vezDasBrancas) { // Se agora é vez das pretas, quem acabou de capturar foram as brancas
-                lblCapturadasBrancas.setText(lblCapturadasBrancas.getText() + " " + pecaCapturada);
-            } else {
-                lblCapturadasPretas.setText(lblCapturadasPretas.getText() + " " + pecaCapturada);
+            if(!vezDasBrancas && qtdCapturadasBrancas < 16) { // Se agora é vez das pretas, quem acabou de capturar foram as brancas
+                slotsPretas[qtdCapturadasBrancas].setText(pecaCapturada);
+                qtdCapturadasBrancas++;
+            } else if(vezDasBrancas && qtdCapturadasPretas < 16) {
+                slotsBrancas[qtdCapturadasPretas].setText(pecaCapturada);
+                qtdCapturadasPretas++;
             }
         }
     }
@@ -66,8 +74,13 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         lblCronometro.setText("Tempo: 00:00");
         lblUltimoMovimento.setText("Último: Nenhum");
         lblVezJogador.setText("Vez: Brancas \u2659");
-        lblCapturadasBrancas.setText("");
-        lblCapturadasPretas.setText("");
+        qtdCapturadasBrancas = 0;
+        qtdCapturadasPretas = 0;
+        
+        for(int i = 0; i < 16; i++) {
+            slotsBrancas[i].setText("");
+            slotsPretas[i].setText("");
+        }
         
         tabuleiro.reiniciarTabuleiro();
         cronometro.start();
@@ -76,6 +89,25 @@ public class PainelTabuleiro extends javax.swing.JPanel {
 //    Apenas despausa o cronômetro de onde parou (Continuar)
     public void continuarJogo() {
         cronometro.start();
+    }
+    
+    private void criarSlotsCapturadas() {
+        java.awt.Font fontePeca = new java.awt.Font("Segoe UI Symbol", java.awt.Font.PLAIN, 26);
+        javax.swing.border.Border bordaSlot = javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200,200, 200));
+        
+        for(int i = 0; i < 16; i++) {
+            //Slot para peças capturadas pelas Brancas
+            slotsBrancas[i] = new javax.swing.JLabel("", javax.swing.SwingConstants.CENTER);
+            slotsBrancas[i].setFont(fontePeca);
+            slotsBrancas[i].setBorder(bordaSlot);
+            painelGradeCapturadasBrancas.add(slotsBrancas[i]);
+            
+            //Slot para peças capturadas pelas Pretas
+            slotsPretas[i] = new javax.swing.JLabel("", javax.swing.SwingConstants.CENTER);
+            slotsPretas[i].setFont(fontePeca);
+            slotsPretas[i].setBorder(bordaSlot);
+            painelGradeCapturadasPretas.add(slotsPretas[i]);
+        }
     }
 
 
@@ -96,10 +128,12 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         painelStatusJogador2 = new javax.swing.JPanel();
         lblStatusCorPreta = new javax.swing.JLabel();
         lblStatusNomeDoJogador2 = new javax.swing.JLabel();
-        painelPecasPretasCapturadas = new javax.swing.JPanel();
+        painelEsquerda = new javax.swing.JPanel();
         lblCapturadasBrancas = new javax.swing.JLabel();
-        painelPecasBrancasCapturadas = new javax.swing.JPanel();
+        painelGradeCapturadasPretas = new javax.swing.JPanel();
+        painelDireita = new javax.swing.JPanel();
         lblCapturadasPretas = new javax.swing.JLabel();
+        painelGradeCapturadasBrancas = new javax.swing.JPanel();
         painelCentral = new javax.swing.JPanel();
         painelInfo = new javax.swing.JPanel();
         btnVoltar = new javax.swing.JButton();
@@ -170,63 +204,56 @@ public class PainelTabuleiro extends javax.swing.JPanel {
 
         add(painelStatusJogadores, java.awt.BorderLayout.PAGE_START);
 
-        lblCapturadasBrancas.setText("jLabel1");
+        painelEsquerda.setPreferredSize(new java.awt.Dimension(110, 0));
+        painelEsquerda.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout painelPecasPretasCapturadasLayout = new javax.swing.GroupLayout(painelPecasPretasCapturadas);
-        painelPecasPretasCapturadas.setLayout(painelPecasPretasCapturadasLayout);
-        painelPecasPretasCapturadasLayout.setHorizontalGroup(
-            painelPecasPretasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPecasPretasCapturadasLayout.createSequentialGroup()
-                .addContainerGap(57, Short.MAX_VALUE)
-                .addComponent(lblCapturadasBrancas)
-                .addContainerGap())
-        );
-        painelPecasPretasCapturadasLayout.setVerticalGroup(
-            painelPecasPretasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelPecasPretasCapturadasLayout.createSequentialGroup()
-                .addGap(156, 156, 156)
-                .addComponent(lblCapturadasBrancas)
-                .addContainerGap(383, Short.MAX_VALUE))
-        );
+        lblCapturadasBrancas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCapturadasBrancas.setText("CAPTURADAS");
+        lblCapturadasBrancas.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 10, 1));
+        painelEsquerda.add(lblCapturadasBrancas, java.awt.BorderLayout.NORTH);
 
-        add(painelPecasPretasCapturadas, java.awt.BorderLayout.LINE_START);
+        painelGradeCapturadasPretas.setLayout(new java.awt.GridLayout(8, 2, 4, 4));
+        painelEsquerda.add(painelGradeCapturadasPretas, java.awt.BorderLayout.CENTER);
 
-        lblCapturadasPretas.setText("jLabel1");
+        add(painelEsquerda, java.awt.BorderLayout.LINE_START);
 
-        javax.swing.GroupLayout painelPecasBrancasCapturadasLayout = new javax.swing.GroupLayout(painelPecasBrancasCapturadas);
-        painelPecasBrancasCapturadas.setLayout(painelPecasBrancasCapturadasLayout);
-        painelPecasBrancasCapturadasLayout.setHorizontalGroup(
-            painelPecasBrancasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelPecasBrancasCapturadasLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblCapturadasPretas)
-                .addContainerGap(57, Short.MAX_VALUE))
-        );
-        painelPecasBrancasCapturadasLayout.setVerticalGroup(
-            painelPecasBrancasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelPecasBrancasCapturadasLayout.createSequentialGroup()
-                .addGap(193, 193, 193)
-                .addComponent(lblCapturadasPretas)
-                .addContainerGap(346, Short.MAX_VALUE))
-        );
+        painelDireita.setPreferredSize(new java.awt.Dimension(110, 0));
+        painelDireita.setLayout(new java.awt.BorderLayout());
 
-        add(painelPecasBrancasCapturadas, java.awt.BorderLayout.LINE_END);
+        lblCapturadasPretas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCapturadasPretas.setText("CAPTURADAS");
+        lblCapturadasPretas.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 1, 10, 1));
+        painelDireita.add(lblCapturadasPretas, java.awt.BorderLayout.NORTH);
+
+        painelGradeCapturadasBrancas.setLayout(new java.awt.GridLayout(8, 2, 4, 4));
+        painelDireita.add(painelGradeCapturadasBrancas, java.awt.BorderLayout.CENTER);
+
+        add(painelDireita, java.awt.BorderLayout.LINE_END);
 
         painelCentral.setLayout(new java.awt.GridBagLayout());
         add(painelCentral, java.awt.BorderLayout.CENTER);
 
-        painelInfo.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
+        painelInfo.setLayout(new java.awt.BorderLayout());
 
+        btnVoltar.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         btnVoltar.setText("VOLTAR");
-        btnVoltar.setPreferredSize(new java.awt.Dimension(28, 27));
+        btnVoltar.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btnVoltar.setMargin(new java.awt.Insets(8, 20, 8, 20));
+        btnVoltar.setPreferredSize(new java.awt.Dimension(150, 27));
         btnVoltar.addActionListener(this::btnVoltarActionPerformed);
-        painelInfo.add(btnVoltar);
+        painelInfo.add(btnVoltar, java.awt.BorderLayout.WEST);
 
+        lblUltimoMovimento.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblUltimoMovimento.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblUltimoMovimento.setText("Última jogadas surgem aqui...");
-        painelInfo.add(lblUltimoMovimento);
+        lblUltimoMovimento.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        painelInfo.add(lblUltimoMovimento, java.awt.BorderLayout.CENTER);
 
+        lblVezJogador.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblVezJogador.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVezJogador.setText("Vez das Brancas");
-        painelInfo.add(lblVezJogador);
+        lblVezJogador.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 30, 10, 30));
+        painelInfo.add(lblVezJogador, java.awt.BorderLayout.EAST);
 
         add(painelInfo, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
@@ -250,9 +277,11 @@ public class PainelTabuleiro extends javax.swing.JPanel {
     private javax.swing.JLabel lblUltimoMovimento;
     private javax.swing.JLabel lblVezJogador;
     private javax.swing.JPanel painelCentral;
+    private javax.swing.JPanel painelDireita;
+    private javax.swing.JPanel painelEsquerda;
+    private javax.swing.JPanel painelGradeCapturadasBrancas;
+    private javax.swing.JPanel painelGradeCapturadasPretas;
     private javax.swing.JPanel painelInfo;
-    private javax.swing.JPanel painelPecasBrancasCapturadas;
-    private javax.swing.JPanel painelPecasPretasCapturadas;
     private javax.swing.JPanel painelStatusJogador1;
     private javax.swing.JPanel painelStatusJogador2;
     private javax.swing.JPanel painelStatusJogadores;
