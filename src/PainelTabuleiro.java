@@ -10,6 +10,10 @@
 public class PainelTabuleiro extends javax.swing.JPanel {
     
     private JanelaPrincipal janela;
+    private TabuleiroDesenhado tabuleiro;
+    
+    private javax.swing.Timer cronometro;
+    private int segundosDecorridos = 0;
 
     /**
      * Creates new form PainelTabuleiro
@@ -18,9 +22,62 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         initComponents();
         this.janela = janela;
         
-        TabuleiroDesenhado tabuleiro = new TabuleiroDesenhado();
+        tabuleiro = new TabuleiroDesenhado(this);
         painelCentral.add(tabuleiro);
+        
+        configurarCronometro();
     }
+    
+    private void configurarCronometro() {
+//        Dispara a cada 1000 milissegundos (1 segundo)
+        cronometro = new javax.swing.Timer(1000, e -> {
+            segundosDecorridos++;
+            int minutos = segundosDecorridos / 60;
+            int segundos = segundosDecorridos % 60;
+            
+            // formato com 00:00 e atualiza o JLabel do topo
+            lblCronometro.setText(String.format("Tempo: %02d:%02d", minutos, segundos));
+        });
+    }
+    
+//    Método chamado automaticamente pelo TabuleiroPanel toda vez que uma peça se move
+    public void atualizarStatusJogo(String textoMovimento, boolean vezDasBrancas, String pecaCapturada) {
+        lblUltimoMovimento.setText("Último: " + textoMovimento);
+        lblVezJogador.setText(vezDasBrancas ? "Vez: Brancas \u2659" : "Vez: Pretas \u265F");
+        
+        // Se capturou alguma peça, adiciona no painel lateral correspondente
+        if(!pecaCapturada.isEmpty()) {
+            if(!vezDasBrancas) { // Se agora é vez das pretas, quem acabou de capturar foram as brancas
+                lblCapturadasBrancas.setText(lblCapturadasBrancas.getText() + " " + pecaCapturada);
+            } else {
+                lblCapturadasPretas.setText(lblCapturadasPretas.getText() + " " + pecaCapturada);
+            }
+        }
+    }
+    
+//    Verifica se já existe um jogo iniciado (tempo maior que 0)
+    public boolean temJogoEmAndamento() {
+        return segundosDecorridos > 0;
+    }
+    
+//    Começa tudo do zero (Novo Jogo)
+    public void iniciarNovoJogo() {
+        segundosDecorridos = 0;
+        lblCronometro.setText("Tempo: 00:00");
+        lblUltimoMovimento.setText("Último: Nenhum");
+        lblVezJogador.setText("Vez: Brancas \u2659");
+        lblCapturadasBrancas.setText("");
+        lblCapturadasPretas.setText("");
+        
+        tabuleiro.reiniciarTabuleiro();
+        cronometro.start();
+    }
+    
+//    Apenas despausa o cronômetro de onde parou (Continuar)
+    public void continuarJogo() {
+        cronometro.start();
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -31,7 +88,6 @@ public class PainelTabuleiro extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnVoltar = new javax.swing.JButton();
         painelStatusJogadores = new javax.swing.JPanel();
         painelStatusJogador1 = new javax.swing.JPanel();
         lblStatusCorBranca = new javax.swing.JLabel();
@@ -41,24 +97,26 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         lblStatusCorPreta = new javax.swing.JLabel();
         lblStatusNomeDoJogador2 = new javax.swing.JLabel();
         painelPecasPretasCapturadas = new javax.swing.JPanel();
+        lblCapturadasBrancas = new javax.swing.JLabel();
         painelPecasBrancasCapturadas = new javax.swing.JPanel();
+        lblCapturadasPretas = new javax.swing.JLabel();
         painelCentral = new javax.swing.JPanel();
+        painelInfo = new javax.swing.JPanel();
+        btnVoltar = new javax.swing.JButton();
+        lblUltimoMovimento = new javax.swing.JLabel();
+        lblVezJogador = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setOpaque(true);
         setPreferredSize(new java.awt.Dimension(950, 650));
         setLayout(new java.awt.BorderLayout());
 
-        btnVoltar.setText("VOLTAR");
-        btnVoltar.addActionListener(this::btnVoltarActionPerformed);
-        add(btnVoltar, java.awt.BorderLayout.PAGE_END);
-
         painelStatusJogadores.setBackground(new java.awt.Color(120, 200, 255));
         painelStatusJogadores.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        painelStatusJogadores.setLayout(new java.awt.GridLayout());
+        painelStatusJogadores.setLayout(new java.awt.GridLayout(1, 0));
 
         painelStatusJogador1.setBackground(new java.awt.Color(120, 200, 255));
-        painelStatusJogador1.setLayout(new java.awt.GridLayout());
+        painelStatusJogador1.setLayout(new java.awt.GridLayout(1, 0));
 
         lblStatusCorBranca.setBackground(new java.awt.Color(255, 255, 255));
         lblStatusCorBranca.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -88,7 +146,7 @@ public class PainelTabuleiro extends javax.swing.JPanel {
         painelStatusJogadores.add(lblCronometro);
 
         painelStatusJogador2.setBackground(new java.awt.Color(120, 200, 255));
-        painelStatusJogador2.setLayout(new java.awt.GridLayout());
+        painelStatusJogador2.setLayout(new java.awt.GridLayout(1, 0));
 
         lblStatusCorPreta.setBackground(new java.awt.Color(0, 0, 0));
         lblStatusCorPreta.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -112,50 +170,87 @@ public class PainelTabuleiro extends javax.swing.JPanel {
 
         add(painelStatusJogadores, java.awt.BorderLayout.PAGE_START);
 
+        lblCapturadasBrancas.setText("jLabel1");
+
         javax.swing.GroupLayout painelPecasPretasCapturadasLayout = new javax.swing.GroupLayout(painelPecasPretasCapturadas);
         painelPecasPretasCapturadas.setLayout(painelPecasPretasCapturadasLayout);
         painelPecasPretasCapturadasLayout.setHorizontalGroup(
             painelPecasPretasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPecasPretasCapturadasLayout.createSequentialGroup()
+                .addContainerGap(57, Short.MAX_VALUE)
+                .addComponent(lblCapturadasBrancas)
+                .addContainerGap())
         );
         painelPecasPretasCapturadasLayout.setVerticalGroup(
             painelPecasPretasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGroup(painelPecasPretasCapturadasLayout.createSequentialGroup()
+                .addGap(156, 156, 156)
+                .addComponent(lblCapturadasBrancas)
+                .addContainerGap(383, Short.MAX_VALUE))
         );
 
         add(painelPecasPretasCapturadas, java.awt.BorderLayout.LINE_START);
+
+        lblCapturadasPretas.setText("jLabel1");
 
         javax.swing.GroupLayout painelPecasBrancasCapturadasLayout = new javax.swing.GroupLayout(painelPecasBrancasCapturadas);
         painelPecasBrancasCapturadas.setLayout(painelPecasBrancasCapturadasLayout);
         painelPecasBrancasCapturadasLayout.setHorizontalGroup(
             painelPecasBrancasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(painelPecasBrancasCapturadasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblCapturadasPretas)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
         painelPecasBrancasCapturadasLayout.setVerticalGroup(
             painelPecasBrancasCapturadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGroup(painelPecasBrancasCapturadasLayout.createSequentialGroup()
+                .addGap(193, 193, 193)
+                .addComponent(lblCapturadasPretas)
+                .addContainerGap(346, Short.MAX_VALUE))
         );
 
         add(painelPecasBrancasCapturadas, java.awt.BorderLayout.LINE_END);
 
         painelCentral.setLayout(new java.awt.GridBagLayout());
         add(painelCentral, java.awt.BorderLayout.CENTER);
+
+        painelInfo.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
+
+        btnVoltar.setText("VOLTAR");
+        btnVoltar.setPreferredSize(new java.awt.Dimension(28, 27));
+        btnVoltar.addActionListener(this::btnVoltarActionPerformed);
+        painelInfo.add(btnVoltar);
+
+        lblUltimoMovimento.setText("Última jogadas surgem aqui...");
+        painelInfo.add(lblUltimoMovimento);
+
+        lblVezJogador.setText("Vez das Brancas");
+        painelInfo.add(lblVezJogador);
+
+        add(painelInfo, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         // TODO add your handling code here:
+        cronometro.stop();
         janela.mostrarTela("menu");
     }//GEN-LAST:event_btnVoltarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnVoltar;
+    private javax.swing.JLabel lblCapturadasBrancas;
+    private javax.swing.JLabel lblCapturadasPretas;
     private javax.swing.JLabel lblCronometro;
     private javax.swing.JLabel lblStatusCorBranca;
     private javax.swing.JLabel lblStatusCorPreta;
     private javax.swing.JLabel lblStatusNomeDoJogador1;
     private javax.swing.JLabel lblStatusNomeDoJogador2;
+    private javax.swing.JLabel lblUltimoMovimento;
+    private javax.swing.JLabel lblVezJogador;
     private javax.swing.JPanel painelCentral;
+    private javax.swing.JPanel painelInfo;
     private javax.swing.JPanel painelPecasBrancasCapturadas;
     private javax.swing.JPanel painelPecasPretasCapturadas;
     private javax.swing.JPanel painelStatusJogador1;

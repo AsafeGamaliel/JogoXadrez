@@ -11,16 +11,29 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JanelaPrincipal.class.getName());
 
+    private PainelTabuleiro painelTabuleiro;
 //    Desenha a janela
     public JanelaPrincipal() {
         initComponents();
         
+//        impede que o Java feche a janela automaticamente ao clicar no X
+        this.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                confirmarSaida();
+            }
+        });
+        
 //      Centraliza a janela na tela do computador ao abrir
         this.setLocationRelativeTo(null);
         
+        painelTabuleiro = new PainelTabuleiro(this);
+        
 //      Registra cada painel no CardLayout com um apelido
         painelConteudo.add(new PainelMenu(this), "menu");
-        painelConteudo.add(new PainelTabuleiro(this), "tabuleiro");
+        painelConteudo.add(painelTabuleiro, "tabuleiro");
         painelConteudo.add(new PainelRegras(this), "regras");
         painelConteudo.add(new PainelRanking(this), "ranking");
         painelConteudo.add(new PainelConfiguracao(this), "configuração");
@@ -36,6 +49,24 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     public void mostrarTela(String nomeTela) {
         java.awt.CardLayout cl = (java.awt.CardLayout) painelConteudo.getLayout();
         cl.show(painelConteudo, nomeTela);
+    }
+    
+    private void confirmarSaida() {
+        int resposta = javax.swing.JOptionPane.showConfirmDialog(
+                this, // Centraliza a caixinha em cima da Janela principal
+                "Tem certeza que deseja sair do jogo?", // Mensagem
+                "Confirmar Sáida", // Título da caixinha
+                javax.swing.JOptionPane.YES_NO_OPTION, // Botões Sim e Não
+                javax.swing.JOptionPane.QUESTION_MESSAGE // Ícone de interrogação
+        );
+        
+        if(resposta == javax.swing.JOptionPane.YES_OPTION) {
+            System.exit(0); // Encerra o programa
+        }
+    }
+    
+    public PainelTabuleiro getPainelTabuleiro() {
+        return painelTabuleiro;
     }
 
     /**

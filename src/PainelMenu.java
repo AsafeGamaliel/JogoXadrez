@@ -74,6 +74,7 @@ public class PainelMenu extends javax.swing.JPanel {
         btnRanking = new javax.swing.JButton();
         btnRegras = new javax.swing.JButton();
         btnConfiguracao = new javax.swing.JButton();
+        btnSair = new javax.swing.JButton();
         lblTituloPrincipal = new LabelCortado("JOGO DE XADREZ");
 
         setBackground(new java.awt.Color(51, 204, 255));
@@ -83,7 +84,7 @@ public class PainelMenu extends javax.swing.JPanel {
 
         pnlBotoesMenu.setMinimumSize(new java.awt.Dimension(100, 100));
         pnlBotoesMenu.setOpaque(false);
-        pnlBotoesMenu.setPreferredSize(new java.awt.Dimension(200, 300));
+        pnlBotoesMenu.setPreferredSize(new java.awt.Dimension(200, 400));
         pnlBotoesMenu.setLayout(new java.awt.GridLayout(0, 1, 15, 15));
 
         btnJogar.setBackground(new java.awt.Color(255, 255, 255));
@@ -142,6 +143,10 @@ public class PainelMenu extends javax.swing.JPanel {
         btnConfiguracao.addActionListener(this::btnConfiguracaoActionPerformed);
         pnlBotoesMenu.add(btnConfiguracao);
 
+        btnSair.setText("SAIR");
+        btnSair.addActionListener(this::btnSairActionPerformed);
+        pnlBotoesMenu.add(btnSair);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 1;
         add(pnlBotoesMenu, gridBagConstraints);
@@ -161,7 +166,34 @@ public class PainelMenu extends javax.swing.JPanel {
 
     private void btnJogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJogarActionPerformed
         // TODO add your handling code here:
-        janela.mostrarTela("tabuleiro");
+        PainelTabuleiro tabuleiro = janela.getPainelTabuleiro();
+        
+//        Se já houver tempo corrido, pergunta o que o jogador quer fazer
+        if(tabuleiro.temJogoEmAndamento()) {
+            Object[] opcoes = {"Novo Jogo", "Continuar Último"};
+            
+            int escolha = javax.swing.JOptionPane.showOptionDialog(
+                    this, 
+                    "Você tem uma partida em andamento. O que deseja fazer?",
+                    "Modo de Jogo",
+                    javax.swing.JOptionPane.YES_NO_OPTION,
+                    javax.swing.JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opcoes,
+                    opcoes
+            );
+            
+            if(escolha == 0) { // Clicou em "Novo Jogo"
+                tabuleiro.iniciarNovoJogo();
+                janela.mostrarTela("tabuleiro");
+            } else if (escolha == 1) { // Clicou em "Continuar Último jogo"
+                tabuleiro.continuarJogo();
+                janela.mostrarTela("tabuleiro");
+            }
+        } else {
+            tabuleiro.iniciarNovoJogo();
+            janela.mostrarTela("tabuleiro");
+        }
     }//GEN-LAST:event_btnJogarActionPerformed
 
     private void btnRegrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegrasActionPerformed
@@ -183,6 +215,11 @@ public class PainelMenu extends javax.swing.JPanel {
         // TODO add your handling code here:
         janela.mostrarTela("desafios");
     }//GEN-LAST:event_btnDesafiosActionPerformed
+
+    private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
+        // TODO add your handling code here:
+        janela.dispatchEvent(new java.awt.event.WindowEvent(janela, java.awt.event.WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_btnSairActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConfiguracao;
@@ -190,6 +227,7 @@ public class PainelMenu extends javax.swing.JPanel {
     private javax.swing.JButton btnJogar;
     private javax.swing.JButton btnRanking;
     private javax.swing.JButton btnRegras;
+    private javax.swing.JButton btnSair;
     private javax.swing.JLabel lblTituloPrincipal;
     private javax.swing.JPanel pnlBotoesMenu;
     // End of variables declaration//GEN-END:variables
